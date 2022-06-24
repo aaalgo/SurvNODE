@@ -105,6 +105,13 @@ class ODEBlock(nn.Module):
         Q0 = torch.zeros(self.number_of_hazards,device=x.device).repeat((y0.shape[0],1))
         yin = torch.cat((p0,p0,Q0,y0),1)
         out = odeint(self.odefunc, yin, tinterval, method="dopri5", atol=1e-8, rtol=1e-8)
+        for i in range(out.shape[0]):
+            Pf = out[i, :, : self.num_probs]
+            Pb = out[i, :, self.num_probs : 2*self.num_probs]
+            print("TIME", i,
+                    "Pf", torch.amin(Pf).item(), torch.amax(Pf).item(),
+                    "Pb", torch.amin(Pb).item(), torch.amax(Pb).item()
+                    )   
         return out       
         
 class SurvNODE(nn.Module):
